@@ -1,0 +1,291 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Create MyFrist AWS Ifrastructure Using with CloudFormation'
+#Create new custom VPC for Production
+Resources:
+  labNonprodVpc: #New custom VPC for Prod
+    Type: AWS::EC2::VPC 
+    Properties: 
+      CidrBlock: '192.168.0.0/16'
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      InstanceTenancy: 'default'
+      Tags: 
+        - Key: 'Name'
+          Value: 'lab-nonprod-vpc'
+        - Key: 'Region'
+          Value: 'Singapore'
+        - Key: 'Environment'
+          Value: 'Non Production'
+  labpublicSubnet1: #PublicSubnet1
+    Type: AWS::EC2::Subnet
+    Properties:
+        AvailabilityZone: 'ap-southeast-1a'
+        CidrBlock: '192.168.1.0/24'
+        MapPublicIpOnLaunch: true
+        Tags: 
+          - Key: 'Name'
+            Value: 'lab-public-subnet1'
+          - Key: 'Region'
+            Value: 'Singapore'
+          - Key: 'Environment'
+            Value: 'Non Production'
+        VpcId: 
+          Ref: 'labNonprodVpc'
+  labpublicSubnet2: #PublicSubnet2
+    Type: AWS::EC2::Subnet
+    Properties:
+        AvailabilityZone: 'ap-southeast-1b'
+        CidrBlock: '192.168.2.0/24'
+        MapPublicIpOnLaunch: true
+        Tags: 
+          - Key: 'Name'
+            Value: 'lab-public-subnet2'
+          - Key: 'Region'
+            Value: 'Singapore'
+          - Key: 'Environment'
+            Value: 'Non Production'
+        VpcId: 
+          Ref: 'labNonprodVpc'
+  labpublicSubnet3: #PublicSubnet3
+    Type: AWS::EC2::Subnet
+    Properties:
+        AvailabilityZone: 'ap-southeast-1c'
+        CidrBlock: '192.168.3.0/24'
+        MapPublicIpOnLaunch: true
+        Tags: 
+          - Key: 'Name'
+            Value: 'lab-public-subnet3'
+          - Key: 'Region'
+            Value: 'Singapore'
+          - Key: 'Environment'
+            Value: 'Non Production'
+        VpcId: 
+          Ref: 'labNonprodVpc'
+  labnonprodIgw: #IGW For Non Production
+    Type: AWS::EC2::InternetGateway
+    Properties: 
+      Tags: 
+        - Key: 'Name'
+          Value: 'lab-nonprod-igw'
+        - Key: 'Region'
+          Value: 'Singapore'
+        - Key: 'Environment'
+          Value: 'Non Production'
+  attachVpcAndIgw: #Attached VPC and IGW for Non Production
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties: 
+      InternetGatewayId: 
+        Ref: 'labnonprodIgw'
+      VpcId: 
+        Ref: 'labNonprodVpc'
+  defaultRouteToIgw: #default route to access Internet
+    Type: AWS::EC2::Route
+    Properties:  
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: 
+        Ref: 'labnonprodIgw'
+      RouteTableId: 'rtb-09e7b72600d53e2d7'
+  labprivateSubnet1: #PrivateSubnet1
+    Type: AWS::EC2::Subnet
+    Properties:
+        AvailabilityZone: 'ap-southeast-1a'
+        CidrBlock: '192.168.4.0/24'
+        MapPublicIpOnLaunch: false
+        Tags: 
+          - Key: 'Name'
+            Value: 'lab-private-subnet1'
+          - Key: 'Region'
+            Value: 'Singapore'
+          - Key: 'Environment'
+            Value: 'Non Production'
+        VpcId: 
+          Ref: 'labNonprodVpc'
+  routeTableforprivateSubnet1: #ForprivateSubnet1
+    Type: AWS::EC2::RouteTable
+    Properties: 
+      Tags: 
+        - Key: 'Name'
+          Value: 'routeTable for pivateSubnet1'
+        - Key: 'Region'
+          Value: 'Singapore'
+        - Key: 'Environment'
+          Value: 'Non Production'
+      VpcId: 
+        Ref: 'labNonprodVpc'
+  privateSubnet1RTAssociation: #RT association for private subnet1 -
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: 
+      RouteTableId: 
+        Ref: 'routeTableforprivateSubnet1'
+      SubnetId: 
+        Ref: 'labprivateSubnet1'
+  labprivateSubnet2: #PrivateSubnet2
+    Type: AWS::EC2::Subnet
+    Properties:
+        AvailabilityZone: 'ap-southeast-1b'
+        CidrBlock: '192.168.5.0/24'
+        MapPublicIpOnLaunch: false
+        Tags: 
+          - Key: 'Name'
+            Value: 'lab-private-subnet2'
+          - Key: 'Region'
+            Value: 'Singapore'
+          - Key: 'Environment'
+            Value: 'Non Production'
+        VpcId: 
+          Ref: 'labNonprodVpc'
+  routeTableforprivateSubnet2: #ForprivateSubnet2
+    Type: AWS::EC2::RouteTable
+    Properties: 
+      Tags: 
+        - Key: 'Name'
+          Value: 'routeTable for pivateSubnet2'
+        - Key: 'Region'
+          Value: 'Singapore'
+        - Key: 'Environment'
+          Value: 'Non Production'
+      VpcId: 
+        Ref: 'labNonprodVpc'
+  privateSubnet2RTAssociation: #RT association for private subnet1 -
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: 
+      RouteTableId: 
+        Ref: 'routeTableforprivateSubnet2'
+      SubnetId: 
+        Ref: 'labprivateSubnet2'
+  labprivateSubnet3: #PrivateSubnet3
+    Type: AWS::EC2::Subnet
+    Properties:
+        AvailabilityZone: 'ap-southeast-1c'
+        CidrBlock: '192.168.6.0/24'
+        MapPublicIpOnLaunch: false
+        Tags: 
+          - Key: 'Name'
+            Value: 'lab-private-subnet3'
+          - Key: 'Region'
+            Value: 'Singapore'
+          - Key: 'Environment'
+            Value: 'Non Production'
+        VpcId: 
+          Ref: 'labNonprodVpc'
+  routeTableforprivateSubnet3: #ForprivateSubnet3
+    Type: AWS::EC2::RouteTable
+    Properties: 
+      Tags: 
+        - Key: 'Name'
+          Value: 'routeTable for pivateSubnet3'
+        - Key: 'Region'
+          Value: 'Singapore'
+        - Key: 'Environment'
+          Value: 'Non Production'
+      VpcId: 
+        Ref: 'labNonprodVpc'
+  privateSubnet3RTAssociation: #RT association for private subnet1 -
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: 
+      RouteTableId: 
+        Ref: 'routeTableforprivateSubnet3'
+      SubnetId: 
+        Ref: 'labprivateSubnet3'
+  natGatewayEIP1: #only required for public NAT Gateway
+    Type: AWS::EC2::EIP
+    Properties: 
+      Domain: 'vpc'
+      Tags: 
+        - Key: 'Name'
+          Value: 'NAT Gateway EIP1'
+        - Key: 'Region'
+          Value: 'Singapore'
+        - Key: 'Environment'
+          Value: 'Non Production'
+  natGateway1: #Nat Gateway for Public Subnet1
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: #only required for public NAT Gateway
+        Fn::GetAtt: [ natGatewayEIP1, AllocationId ]
+      ConnectivityType: 'public'
+      SubnetId:
+        Ref: 'labpublicSubnet1'
+      Tags:
+        - Key: 'Name'
+          Value: 'public-natGateway1'
+        - Key: 'Region'
+          Value: 'Singapore'
+        - Key: 'Environment'
+          Value: 'Non Production' 
+  natGatewayEIP2: #only required for public NAT Gateway
+    Type: AWS::EC2::EIP
+    Properties: 
+      Domain: 'vpc'
+      Tags: 
+        - Key: 'Name'
+          Value: 'NAT Gateway EIP2'
+        - Key: 'Region'
+          Value: 'Singapore'
+        - Key: 'Environment'
+          Value: 'Non Production'
+  natGateway2: #Nat Gateway for Public Subnet2
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: #only required for public NAT Gateway
+        Fn::GetAtt: [ natGatewayEIP2, AllocationId ]
+      ConnectivityType: 'public'
+      SubnetId:
+        Ref: 'labpublicSubnet2'
+      Tags:
+        - Key: 'Name'
+          Value: 'public-natGateway2'
+        - Key: 'Region'
+          Value: 'Singapore'
+        - Key: 'Environment'
+          Value: 'Non Production' 
+  natGatewayEIP3: #only required for public NAT Gateway
+    Type: AWS::EC2::EIP
+    Properties: 
+      Domain: 'vpc'
+      Tags: 
+        - Key: 'Name'
+          Value: 'NAT Gateway EIP3'
+        - Key: 'Region'
+          Value: 'Singapore'
+        - Key: 'Environment'
+          Value: 'Non Production'
+  natGateway3: #Nat Gateway for Public Subnet1
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: #only required for public NAT Gateway
+        Fn::GetAtt: [ natGatewayEIP3, AllocationId ]
+      ConnectivityType: 'public'
+      SubnetId:
+        Ref: 'labpublicSubnet3'
+      Tags:
+        - Key: 'Name'
+          Value: 'public-natGateway3'
+        - Key: 'Region'
+          Value: 'Singapore'
+        - Key: 'Environment'
+          Value: 'Non Production'
+  defaultRouteToNatGatewayforprivateSubnet1:
+    Type: AWS::EC2::Route 
+    Properties: 
+      RouteTableId: 
+        Ref: 'routeTableforprivateSubnet1' 
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: 
+        Ref: 'natGateway1'
+  defaultRouteToNatGatewayforprivateSubnet2:
+    Type: AWS::EC2::Route 
+    Properties: 
+      RouteTableId: 
+        Ref: 'routeTableforprivateSubnet2' 
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: 
+        Ref: 'natGateway2'
+  defaultRouteToNatGatewayforprivateSubnet3:
+    Type: AWS::EC2::Route 
+    Properties: 
+      RouteTableId: 
+        Ref: 'routeTableforprivateSubnet3' 
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: 
+        Ref: 'natGateway3'  
