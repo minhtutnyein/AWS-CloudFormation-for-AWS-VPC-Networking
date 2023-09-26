@@ -1,2 +1,2 @@
-# AWS-CloudFormation-for-AWS-VPC-Networking
+# AWS-CloudFormation-networking
 Architect on AWS
